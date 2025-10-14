@@ -6,6 +6,15 @@ import os
 
 app = Flask(__name__)
 
+import nltk
+nltk.download("all")
+# Configure pdfkit to use wkhtmltopdf
+try:
+    config = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
+except Exception as e:
+    print(f"Warning: wkhtmltopdf not found in default location: {e}")
+    config = None
+
 app.secret_key= 'aica2'
 
 # first run these three lines of code
@@ -390,4 +399,5 @@ def generate_portfolio_html(name, title, summary, contact_info, skills, projects
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=False)
+    app.run(host="0.0.0.0", port=port, debug=True)
+    
