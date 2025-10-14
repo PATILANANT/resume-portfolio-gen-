@@ -236,11 +236,12 @@ def generate_portfolio():
             'location': location
         }, skills=skills, projects=projects, education=education, experience=experience)
         
-        pdf_path = os.path.join(app.static_folder, 'downloads', f'portfolio_{name.replace(" ", "_")}.pdf')
+        pdf_filename = f'portfolio_{name.replace(" ", "_")}.pdf'
+        pdf_path = os.path.join(app.static_folder, 'downloads', pdf_filename)
         os.makedirs(os.path.dirname(pdf_path), exist_ok=True)
         try:
             pdfkit.from_string(html_content, pdf_path, configuration=config)
-            return render_template('downloadportfolio.html', pdf_path=pdf_path, name=name)
+            return render_template('downloadportfolio.html', pdf_path=pdf_filename, name=name)
         except Exception as e:
             print(f"PDF Generation Error: {e}")
             return render_template('cantdownload.html')
