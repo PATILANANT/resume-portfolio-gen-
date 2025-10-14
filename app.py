@@ -6,6 +6,11 @@ import os
 
 app = Flask(__name__)
 
+# Ensure static folder exists
+static_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
+downloads_folder = os.path.join(static_folder, 'downloads')
+os.makedirs(downloads_folder, exist_ok=True)
+
 import nltk
 nltk.download("all")
 # Configure pdfkit to use wkhtmltopdf
@@ -59,9 +64,10 @@ def test_generate():
         question_list = subjective_generator.generate_questions()
         return render_template('predict.html', cresults=question_list)
 
-    except:
-        flash('Error Occurred!')
-        return redirect(url_for('/predict'))
+    except Exception as e:
+        print(f"Question Generation Error: {e}")
+        flash('Error occurred while generating questions. Please try again.')
+        return redirect(url_for('index1'))
 
 @app.route("/generate")
 def gen():
@@ -140,9 +146,14 @@ def generate():
 
         """
 
-        pdf_path = 'resume.pdf'
-        pdfkit.from_string(html_content, pdf_path)
-        return render_template('downloadpdf.html', pdf_path=pdf_path)
+        pdf_path = os.path.join(app.static_folder, 'downloads', 'resume.pdf')
+        os.makedirs(os.path.dirname(pdf_path), exist_ok=True)
+        try:
+            pdfkit.from_string(html_content, pdf_path, configuration=config)
+            return render_template('downloadpdf.html', pdf_path=pdf_path)
+        except Exception as e:
+            print(f"PDF Generation Error: {e}")
+            return render_template('cantdownload.html')
     return render_template('cantdownload.html')
 
 
@@ -225,10 +236,14 @@ def generate_portfolio():
             'location': location
         }, skills=skills, projects=projects, education=education, experience=experience)
         
-        pdf_path = f'portfolio_{name.replace(" ", "_")}.pdf'
-        pdfkit.from_string(html_content, pdf_path)
-        
-        return render_template('downloadportfolio.html', pdf_path=pdf_path, name=name)
+        pdf_path = os.path.join(app.static_folder, 'downloads', f'portfolio_{name.replace(" ", "_")}.pdf')
+        os.makedirs(os.path.dirname(pdf_path), exist_ok=True)
+        try:
+            pdfkit.from_string(html_content, pdf_path, configuration=config)
+            return render_template('downloadportfolio.html', pdf_path=pdf_path, name=name)
+        except Exception as e:
+            print(f"PDF Generation Error: {e}")
+            return render_template('cantdownload.html')
     
     return render_template('cantdownload.html')
 
