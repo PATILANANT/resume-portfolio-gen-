@@ -36,11 +36,11 @@
 <body>
     <div class="container">
         <h1>Your PDF is ready!</h1>
-        {% if pdf_path %}
-        <a href="{{ url_for('static', filename='downloads/resume.pdf') }}" class="download-button" download>Download PDF</a>
-        {% else %}
-        <p>PDF not found. Please try again.</p>
-        {% endif %}
+    {% if pdf_path %}
+    <a href="{{ url_for('static', filename='downloads/' + pdf_path) }}" class="download-button" download>Download PDF</a>
+    {% else %}
+    <p>PDF not found. Please try again.</p>
+    {% endif %}
     </div>
 </body>
 </html>

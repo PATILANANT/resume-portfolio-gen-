@@ -146,11 +146,12 @@ def generate():
 
         """
 
-        pdf_path = os.path.join(app.static_folder, 'downloads', 'resume.pdf')
+        pdf_filename = 'resume.pdf'
+        pdf_path = os.path.join(app.static_folder, 'downloads', pdf_filename)
         os.makedirs(os.path.dirname(pdf_path), exist_ok=True)
         try:
             pdfkit.from_string(html_content, pdf_path, configuration=config)
-            return render_template('downloadpdf.html', pdf_path=pdf_path)
+            return render_template('downloadpdf.html', pdf_path=pdf_filename)
         except Exception as e:
             print(f"PDF Generation Error: {e}")
             return render_template('cantdownload.html')
