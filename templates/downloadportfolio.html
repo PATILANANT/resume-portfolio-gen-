@@ -74,7 +74,7 @@
         <h1>Portfolio Generated Successfully!</h1>
     <p>Your professional portfolio for <strong>{{ name }}</strong> has been generated and saved to your directory.</p>
     {% if pdf_path %}
-    <a href="{{ url_for('static', filename='downloads/' + pdf_path.split('/')[-1]) }}" class="download-button" download>Download Portfolio PDF</a>
+    <a href="{{ url_for('static', filename='downloads/' + pdf_path) }}" class="download-button" download>Download Portfolio PDF</a>
     {% else %}
     <p>PDF not found. Please try again.</p>
     {% endif %}
