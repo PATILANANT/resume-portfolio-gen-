@@ -1,0 +1,6 @@
+flask
+numpy
+nltk
+pdfkit
+pdfminer
+PyPDF2

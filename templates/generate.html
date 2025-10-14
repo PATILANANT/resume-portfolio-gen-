@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CVGen.AI - Professional Resume Builder</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-light: #818cf8;
+      --primary-dark: #4f46e5;
+      --accent: #10b981;
+      --dark: #0f172a;
+      --darker: #020617;
+      --light: #f8fafc;
+      --gray: #94a3b8;
+      --dark-gray: #334155;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--darker);
+      color: var(--light);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .video-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      object-fit: cover;
+      opacity: 0.2;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      width: 100%;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .logo {
+      width: 120px;
+      margin-bottom: 1rem;
+      filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.5));
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: var(--gray);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .resume-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 2rem;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .form-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-section h2 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      color: var(--primary-light);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid var(--dark-gray);
+      border-radius: 8px;
+      color: var(--light);
+      font-family: 'Inter', sans-serif;
+      transition: all 0.3s ease;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .required-field::after {
+      content: " *";
+      color: var(--accent);
+    }
+
+    .submit-btn {
+      grid-column: 1 / -1;
+      padding: 1rem;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .submit-btn:hover {
+      background: linear-gradient(135deg, var(--primary-light), var(--primary));
+      box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+
+    .character-count {
+      font-size: 0.8rem;
+      color: var(--gray);
+      text-align: right;
+      margin-top: 0.25rem;
+    }
+
+    @media (max-width: 768px) {
+      .resume-form {
+        grid-template-columns: 1fr;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .subtitle {
+        font-size: 1rem;
+      }
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-section {
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    /* Tooltip for info */
+    .info-tooltip {
+      position: relative;
+      display: inline-block;
+      margin-left: 0.5rem;
+      cursor: help;
+    }
+
+    .info-tooltip::after {
+      content: "i";
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      font-size: 0.7rem;
+      font-weight: bold;
+      background: var(--dark-gray);
+      color: var(--light);
+      border-radius: 50%;
+    }
+
+    .info-tooltip:hover::before {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--dark);
+      color: var(--light);
+      padding: 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      width: 200px;
+      z-index: 10;
+      border: 1px solid var(--primary);
+    }
+  </style>
+</head>
+<body>
+  <video class="video-background" autoplay muted loop>
+    <source src="static/assets/predict.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+  <div class="container">
+    <header>
+      <img src="static/assets/logo.png" alt="CVGen.AI Logo" class="logo">
+      <h1>Professional Resume Builder</h1>
+      <p class="subtitle">Fill in your details below and let our AI craft the perfect resume for your next career move</p>
+    </header>
+
+    <form class="resume-form" action="/generatepdf" method="POST">
+      <!-- Personal Information -->
+      <div class="form-section">
+        <h2>📌 Personal Information</h2>
+        <label for="name" class="required-field">Full Name</label>
+        <input type="text" id="name" name="Name" placeholder="John Doe" required>
+        
+        <label for="Email" class="required-field">Email</label>
+        <input type="email" id="Email" name="Email" placeholder="john.doe@example.com" required>
+        
+        <label for="LinkedIn">LinkedIn Profile</label>
+        <input type="text" id="LinkedIn" name="LinkedIn" placeholder="https://linkedin.com/in/yourprofile">
+      </div>
+
+      <!-- Education -->
+      <div class="form-section">
+        <h2>🎓 Education</h2>
+        <label for="University" class="required-field">University Name</label>
+        <input type="text" id="University" name="University" placeholder="Stanford University" required>
+        
+        <label for="Graduation" class="required-field">Degree</label>
+        <input type="text" id="Graduation" name="Graduation" placeholder="Bachelor of Science in Computer Science" required>
+        
+        <label for="CGPA" class="required-field">CGPA/GPA</label>
+        <input type="text" id="CGPA" name="CGPA" placeholder="3.8/4.0" required>
+      </div>
+
+      <!-- Experience -->
+      <div class="form-section">
+        <h2>💼 Work Experience</h2>
+        <label for="Experience" class="required-field">Years of Experience</label>
+        <input type="text" id="Experience" name="Experience" placeholder="3" required>
+        
+        <label for="Internship" class="required-field">Internship Roles</label>
+        <textarea id="Internship" name="Internship" placeholder="Describe your internship experiences (Max 1000 Characters)" required></textarea>
+        <div class="character-count">0/1000 characters</div>
+      </div>
+
+      <!-- Skills -->
+      <div class="form-section">
+        <h2>🛠 Skills</h2>
+        <label for="Skills" class="required-field">Technical & Soft Skills</label>
+        <textarea id="Skills" name="Skills" placeholder="List your skills separated by commas (Max 1000 Characters)" required></textarea>
+        <div class="character-count">0/1000 characters</div>
+        
+        <label for="course1" class="required-field">Primary Skill/Course</label>
+        <input type="text" id="course1" name="course1" placeholder="Machine Learning" required>
+        
+        <label for="course2">Additional Skill/Course</label>
+        <input type="text" id="course2" name="course2" placeholder="Data Structures">
+        
+        <label for="course3">Additional Skill/Course</label>
+        <input type="text" id="course3" name="course3" placeholder="Web Development">
+      </div>
+
+      <!-- Projects -->
+      <div class="form-section">
+        <h2>🚀 Projects</h2>
+        <label for="projects" class="required-field">Notable Projects</label>
+        <textarea id="projects" name="projects" placeholder="Describe your projects with technologies used (Max 1500 Characters)" required></textarea>
+        <div class="character-count">0/1500 characters</div>
+      </div>
+
+      <!-- Achievements -->
+      <div class="form-section">
+        <h2>🏆 Achievements</h2>
+        <label for="Achievements" class="required-field">Your Accomplishments</label>
+        <textarea id="Achievements" name="Achievements" placeholder="List your achievements, awards, certifications (Max 1000 Characters)" required></textarea>
+        <div class="character-count">0/1000 characters</div>
+      </div>
+
+      <button type="submit" class="submit-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+          <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+        </svg>
+        Generate Professional Resume
+      </button>
+    </form>
+  </div>
+
+  <script>
+    // Character count functionality
+    document.querySelectorAll('textarea').forEach(textarea => {
+      const counter = textarea.nextElementSibling;
+      if (counter && counter.classList.contains('character-count')) {
+        textarea.addEventListener('input', () => {
+          const maxLength = parseInt(textarea.getAttribute('placeholder').match(/Max (\d+) Characters/)[1]);
+          const remaining = maxLength - textarea.value.length;
+          counter.textContent = `${textarea.value.length}/${maxLength} characters`;
+          
+          if (remaining < 0) {
+            counter.style.color = '#ef4444';
+          } else if (remaining < 50) {
+            counter.style.color = '#f59e0b';
+          } else {
+            counter.style.color = 'var(--gray)';
+          }
+        });
+      }
+    });
+
+    // Form validation
+    document.querySelector('form').addEventListener('submit', (e) => {
+      let isValid = true;
+      
+      document.querySelectorAll('[required]').forEach(field => {
+        if (!field.value.trim()) {
+          field.style.borderColor = '#ef4444';
+          isValid = false;
+        }
+      });
+      
+      if (!isValid) {
+        e.preventDefault();
+        alert('Please fill in all required fields marked with *');
+      }
+    });
+
+    // Clear error when typing in required fields
+    document.querySelectorAll('[required]').forEach(field => {
+      field.addEventListener('input', () => {
+        if (field.value.trim()) {
+          field.style.borderColor = 'var(--dark-gray)';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

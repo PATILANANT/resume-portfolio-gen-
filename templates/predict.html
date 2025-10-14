@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Document Analyzer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-light: #818cf8;
+      --primary-dark: #4f46e5;
+      --accent: #10b981;
+      --dark: #0f172a;
+      --light: #f8fafc;
+      --gray: #94a3b8;
+      --dark-gray: #334155;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--dark);
+      color: var(--light);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    .video-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    #background-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.15;
+    }
+
+    .main-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      width: 100%;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 700;
+    }
+
+    .header p {
+      font-size: 1.1rem;
+      color: var(--gray);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .content-wrapper {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .upload-section {
+      flex: 1;
+      min-width: 300px;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 2rem;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s ease;
+    }
+
+    .upload-section:hover {
+      transform: translateY(-5px);
+      border-color: var(--primary);
+    }
+
+    .preview-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+
+    .preview-container img {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .upload-area {
+      border: 2px dashed var(--primary);
+      border-radius: 8px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 1.5rem;
+    }
+
+    .upload-area:hover {
+      background: rgba(99, 102, 241, 0.1);
+      border-color: var(--accent);
+    }
+
+    .upload-area p {
+      margin-bottom: 1rem;
+      color: var(--gray);
+    }
+
+    .upload-area .icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
+
+    #pdf-upload {
+      display: none;
+    }
+
+    .upload-button {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .upload-button:hover {
+      background: linear-gradient(135deg, var(--primary-light), var(--primary));
+      box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+    }
+
+    .upload-button:disabled {
+      background: var(--dark-gray);
+      cursor: not-allowed;
+    }
+
+    #submit-button {
+      margin-top: 1rem;
+      background: linear-gradient(135deg, var(--accent), #059669);
+    }
+
+    #submit-button:hover {
+      background: linear-gradient(135deg, #34d399, #059669);
+      box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+    }
+
+    .chat-section {
+      flex: 1;
+      min-width: 300px;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 2rem;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .chat-section h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .question {
+      background: rgba(30, 41, 59, 0.5);
+      border-left: 3px solid var(--primary);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 0 8px 8px 0;
+      transition: all 0.3s ease;
+    }
+
+    .question:hover {
+      background: rgba(30, 41, 59, 0.8);
+      transform: translateX(5px);
+    }
+
+    .question p {
+      color: var(--light);
+      line-height: 1.6;
+    }
+
+    .filename-display {
+      margin-top: 1rem;
+      padding: 0.5rem;
+      background: rgba(30, 41, 59, 0.5);
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      color: var(--gray);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 768px) {
+      .content-wrapper {
+        flex-direction: column;
+      }
+      
+      .header h1 {
+        font-size: 2rem;
+      }
+      
+      .header p {
+        font-size: 1rem;
+      }
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .question {
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(30, 41, 59, 0.5);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary-light);
+    }
+  </style>
+</head>
+<body>
+  <div class="video-container">
+    <video id="background-video" autoplay muted loop>
+      <source src="static/assets/predict.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
+
+  <div class="main-container">
+    <div class="header">
+      <h1>AI Document Analyzer</h1>
+      <p>Upload your document in PDF format and receive intelligent questions generated by our AI</p>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="upload-section">
+        <div class="preview-container">
+          <img class="image" src="static/assets/predict.png" alt="Document Preview">
+        </div>
+
+        <form id="upload-section" action="/test_generate" method="post" enctype="multipart/form-data">
+          <div class="upload-area" id="drop-zone" ondragover="dragOverHandler(event)" ondrop="dropHandler(event)">
+            <div class="icon">📄</div>
+            <p>Drag & drop your PDF file here or click to browse</p>
+            <input type="file" name="pdf_file" id="pdf-upload" accept=".pdf" onchange="handleFileSelect(event)">
+          </div>
+          <div id="filename-display" class="filename-display" style="display: none;"></div>
+          <input type="submit" class="uploadbutton" id="submit-button" value="Generate Questions" disabled>
+        </form>
+      </div>
+
+      <div class="chat-section">
+        <h2>📋 Generated Questions</h2>
+        <div id="questions-container">
+          {% for question in cresults %}
+            <div class="question">
+              <p>{{ question }}</p>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // File handling
+    function dragOverHandler(event) {
+      event.preventDefault();
+      event.currentTarget.style.background = 'rgba(99, 102, 241, 0.2)';
+      event.currentTarget.style.borderColor = 'var(--accent)';
+    }
+
+    function dragLeaveHandler(event) {
+      event.preventDefault();
+      event.currentTarget.style.background = '';
+      event.currentTarget.style.borderColor = 'var(--primary)';
+    }
+
+    function dropHandler(event) {
+      event.preventDefault();
+      event.currentTarget.style.background = '';
+      event.currentTarget.style.borderColor = 'var(--primary)';
+      
+      const files = event.dataTransfer.files;
+      if (files.length > 0) {
+        handleFiles(files);
+      }
+    }
+
+    function handleFileSelect(event) {
+      const files = event.target.files;
+      if (files.length > 0) {
+        handleFiles(files);
+      }
+    }
+
+    function handleFiles(files) {
+      const file = files[0];
+      if (file.type !== 'application/pdf') {
+        alert('Please upload a PDF file');
+        return;
+      }
+
+      // Display filename
+      const filenameDisplay = document.getElementById('filename-display');
+      filenameDisplay.textContent = `Selected: ${file.name}`;
+      filenameDisplay.style.display = 'block';
+
+      // Enable submit button
+      document.getElementById('submit-button').disabled = false;
+
+      // Preview PDF (simplified - in real app you might use PDF.js)
+      const previewContainer = document.querySelector('.preview-container');
+      previewContainer.innerHTML = `
+        <div style="text-align: center;">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">📄</div>
+          <p style="color: var(--gray);">${file.name}</p>
+          <p style="color: var(--primary); font-size: 0.9rem;">PDF ready for analysis</p>
+        </div>
+      `;
+    }
+
+    // Make the upload area clickable
+    document.getElementById('drop-zone').addEventListener('click', () => {
+      document.getElementById('pdf-upload').click();
+    });
+
+    // Animation for new questions
+    function animateNewQuestion(question) {
+      const container = document.getElementById('questions-container');
+      const div = document.createElement('div');
+      div.className = 'question';
+      div.style.opacity = '0';
+      div.innerHTML = `<p>${question}</p>`;
+      container.appendChild(div);
+      
+      // Trigger animation
+      setTimeout(() => {
+        div.style.opacity = '1';
+      }, 10);
+    }
+
+    // If you need to add questions dynamically via JavaScript:
+    // animateNewQuestion("This is a new question");
+  </script>
+</body>
+</html>

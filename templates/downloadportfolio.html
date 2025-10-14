@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Generated Successfully</title>
+    <style>
+        body {
+            background-color: #0f172a;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+        .container {
+            background: rgba(30, 41, 59, 0.8);
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            max-width: 500px;
+            width: 90%;
+        }
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        h1 {
+            color: #06d6a0;
+            margin-bottom: 1rem;
+        }
+        p {
+            color: #94a3b8;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        .download-button {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            padding: 15px 32px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            display: inline-block;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .download-button:hover {
+            background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4);
+        }
+        .back-link {
+            display: block;
+            margin-top: 1.5rem;
+            color: #8b5cf6;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-icon">🎉</div>
+        <h1>Portfolio Generated Successfully!</h1>
+        <p>Your professional portfolio for <strong>{{ name }}</strong> has been generated and saved to your directory.</p>
+        <a href="{{ url_for('portfolio') }}" class="download-button">Create Another Portfolio</a>
+        <a href="{{ url_for('index') }}" class="back-link">← Back to Home</a>
+    </div>
+</body>
+</html>
